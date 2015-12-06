@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <memory>
+
 namespace mn {
 
 template<typename T>
@@ -27,13 +29,14 @@ class matrix {
 protected:
 	const int n_rows;
 	const int n_cols;
-	T* mem_block;
+	std::shared_ptr<T> mem_block;
 public:
 	class matrix_row_proxy {
 	private:
-		T* mem_block;
+		std::shared_ptr<T> mem_block;
+		const int offset;
 	public:
-		matrix_row_proxy(T* mem_block) : mem_block(mem_block) {}
+		matrix_row_proxy(std::shared_ptr<T> mem_block, const int offset) : mem_block(mem_block), offset(offset) {}
 		T& operator[](const int index);
 		const T& operator[] (const int index) const;
 	};
@@ -50,28 +53,24 @@ public:
 };
 
 template<typename T>
-inline matrix<T>::matrix(): rows(1), cols(1)
+inline matrix<T>::matrix() : rows(1), cols(1), mem_block(new T[1], [](T* ptr) { delete[] ptr; })
 {
-	mem_block = new T[1];
 }
 
 template<typename T>
-inline matrix<T>::matrix(const matrix& m): n_rows(m.n_rows), n_cols(m.n_cols)
+inline matrix<T>::matrix(const matrix& m) : n_rows(m.n_rows), n_cols(m.n_cols), mem_block(new T[n_rows * n_cols], [](T* ptr) { delete[] ptr; })
 {
-	mem_block = new T[n_rows * n_cols];
-	std::memcpy(mem_block, m.mem_block, n_rows * n_cols * sizeof(T));
+	std::memcpy(mem_block.get(), m.mem_block.get(), n_rows * n_cols * sizeof(T));
 }
 
 template<typename T>
-inline matrix<T>::matrix(int rows, int cols): n_rows(rows), n_cols(cols)
+inline matrix<T>::matrix(int rows, int cols) : n_rows(rows), n_cols(cols), mem_block(new T[n_rows * n_cols], [](T* ptr) { delete[] ptr; })
 {
-	mem_block = new T[n_rows * n_cols];
 }
 
 template<typename T>
 inline matrix<T>::~matrix()
 {
-	delete[] mem_block;
 }
 
 template<typename T>
@@ -89,31 +88,31 @@ inline const int matrix<T>::cols() const
 template<typename T>
 inline T& matrix<T>::matrix_row_proxy::operator[](const int index)
 {
-	return mem_block[index];
+	return mem_block.get()[offset + index];
 }
 
 template<typename T>
 inline const T& matrix<T>::matrix_row_proxy::operator[](const int index) const
 {
-	return mem_block[index];
+	return mem_block.get()[offset + index];
 }
 
 template<typename T>
 inline typename matrix<T>::matrix_row_proxy matrix<T>::operator[](const int index)
 {
-	return matrix_row_proxy(&mem_block[index * n_cols]);
+	return matrix_row_proxy(mem_block, n_cols * index);
 }
 
 template<typename T>
 inline typename const matrix<T>::matrix_row_proxy matrix<T>::operator[](const int index) const
 {
-	return matrix_row_proxy(&mem_block[index * n_cols]);
+	return matrix_row_proxy(mem_block, n_cols * index);
 }
 
 template<typename T>
 inline T* matrix<T>::raw()
 {
-	return mem_block;
+	return mem_block.get();
 }
 
 }
