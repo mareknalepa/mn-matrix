@@ -25,31 +25,35 @@
 namespace mn {
 
 template<typename T>
-class matrix {
+class matrix
+{
 protected:
+	class row_proxy;
 	const int n_rows;
 	const int n_cols;
 	std::shared_ptr<T> mem_block;
 public:
-	class matrix_row_proxy {
-	private:
-		std::shared_ptr<T> mem_block;
-		const int offset;
-	public:
-		matrix_row_proxy(std::shared_ptr<T> mem_block, const int offset) : mem_block(mem_block), offset(offset) {}
-		T& operator[](const int index);
-		const T& operator[] (const int index) const;
-	};
-
 	matrix();
 	matrix(const matrix& m);
 	matrix(int rows, int cols);
 	~matrix();
 	const int rows() const;
 	const int cols() const;
-	matrix_row_proxy operator[](const int index);
-	const matrix_row_proxy operator[] (const int index) const;
+	row_proxy operator[](const int index);
+	const row_proxy operator[] (const int index) const;
 	T* raw();
+};
+
+template<typename T>
+class matrix<T>::row_proxy
+{
+private:
+	std::shared_ptr<T> mem_block;
+	const int offset;
+public:
+	row_proxy(std::shared_ptr<T> mem_block, const int offset) : mem_block(mem_block), offset(offset) {}
+	T& operator[](const int index);
+	const T& operator[] (const int index) const;
 };
 
 template<typename T>
@@ -86,27 +90,27 @@ inline const int matrix<T>::cols() const
 }
 
 template<typename T>
-inline T& matrix<T>::matrix_row_proxy::operator[](const int index)
+inline T& matrix<T>::row_proxy::operator[](const int index)
 {
 	return mem_block.get()[offset + index];
 }
 
 template<typename T>
-inline const T& matrix<T>::matrix_row_proxy::operator[](const int index) const
+inline const T& matrix<T>::row_proxy::operator[](const int index) const
 {
 	return mem_block.get()[offset + index];
 }
 
 template<typename T>
-inline typename matrix<T>::matrix_row_proxy matrix<T>::operator[](const int index)
+inline typename matrix<T>::row_proxy matrix<T>::operator[](const int index)
 {
-	return matrix_row_proxy(mem_block, n_cols * index);
+	return row_proxy(mem_block, n_cols * index);
 }
 
 template<typename T>
-inline typename const matrix<T>::matrix_row_proxy matrix<T>::operator[](const int index) const
+inline typename const matrix<T>::row_proxy matrix<T>::operator[](const int index) const
 {
-	return matrix_row_proxy(mem_block, n_cols * index);
+	return row_proxy(mem_block, n_cols * index);
 }
 
 template<typename T>
