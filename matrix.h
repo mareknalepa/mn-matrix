@@ -29,15 +29,15 @@ namespace mn {
 template<typename T>
 class matrix
 {
+public:
+	class iterator;
 protected:
+	class region;
 	class row_proxy;
 	const int n_rows;
 	const int n_cols;
+	region reg;
 	bool continuous;
-	int rows_begin;
-	int rows_end;
-	int cols_begin;
-	int cols_end;
 	std::shared_ptr<T> mem_block;
 public:
 	matrix();
@@ -49,9 +49,24 @@ public:
 	const int cols() const;
 	row_proxy operator[](const int index);
 	const row_proxy operator[] (const int index) const;
-	matrix<T>& region(int rows_from, int rows_to, int cols_from, int cols_to);
+	matrix<T>& subregion(int rows_from, int rows_to, int cols_from, int cols_to);
 	matrix<T>& whole();
 	T* raw();
+	iterator begin();
+	iterator end();
+};
+
+template<typename T>
+class matrix<T>::region
+{
+public:
+	region() : rows_begin(0), rows_end(0), cols_begin(0), cols_end(0) {}
+	bool operator==(const region& r) const { return (rows_begin == r.rows_begin && rows_end == r.rows_end && cols_begin == r.cols_begin && cols_end == r.cols_end); }
+	bool operator!=(const region& r) const { return !(rows_begin == r.rows_begin && rows_end == r.rows_end && cols_begin == r.cols_begin && cols_end == r.cols_end); }
+	int rows_begin;
+	int rows_end;
+	int cols_begin;
+	int cols_end;
 };
 
 template<typename T>
@@ -64,6 +79,35 @@ public:
 	row_proxy(std::shared_ptr<T> mem_block, const int offset) : mem_block(mem_block), offset(offset) {}
 	T& operator[](const int index);
 	const T& operator[] (const int index) const;
+};
+
+template<typename T>
+class matrix<T>::iterator
+{
+protected:
+	std::shared_ptr<T> mem_block;
+	int n_rows;
+	int n_cols;
+	typename matrix<T>::region reg;
+	int current_row;
+	int current_col;
+public:
+	iterator() :
+		mem_block(std::nullptr_t(0)), n_rows(0), n_cols(0), current_row(-1), current_col(-1) {}
+	iterator(std::shared_ptr<T> mem_block, int rows, int cols, typename matrix<T>::region region, int row, int col) :
+		mem_block(mem_block), n_rows(rows), n_cols(cols), reg(region), current_row(row), current_col(col) {}
+	iterator(const iterator& i) :
+		mem_block(i.mem_block), n_rows(i.n_rows), n_cols(i.n_cols), reg(i.reg), current_row(i.current_row), current_col(i.current_col) {}
+	~iterator() {}
+	iterator& operator=(const iterator& i);
+	bool operator==(const iterator& i) const;
+	bool operator!=(const iterator& i) const;
+	iterator& operator++();
+	iterator operator++(int);
+	iterator& operator--();
+	iterator operator--(int);
+	T& operator*() const;
+	T* operator->() const;
 };
 
 template<typename T>
@@ -94,10 +138,10 @@ template<typename T>
 inline void matrix<T>::init()
 {
 	continuous = true;
-	rows_begin = 0;
-	rows_end = n_rows - 1;
-	cols_begin = 0;
-	cols_end = n_cols - 1;
+	reg.rows_begin = 0;
+	reg.rows_end = n_rows - 1;
+	reg.cols_begin = 0;
+	reg.cols_end = n_cols - 1;
 }
 
 template<typename T>
@@ -106,7 +150,7 @@ inline const int matrix<T>::rows() const
 	if (continuous)
 		return n_rows;
 	else
-		return rows_end - rows_begin + 1;
+		return reg.rows_end - reg.rows_begin + 1;
 }
 
 template<typename T>
@@ -115,7 +159,7 @@ inline const int matrix<T>::cols() const
 	if (continuous)
 		return n_cols;
 	else
-		return cols_end - cols_begin + 1;
+		return reg.cols_end - reg.cols_begin + 1;
 }
 
 template<typename T>
@@ -133,17 +177,17 @@ inline const T& matrix<T>::row_proxy::operator[](const int index) const
 template<typename T>
 inline typename matrix<T>::row_proxy matrix<T>::operator[](const int index)
 {
-	return row_proxy(mem_block, n_cols * (index + rows_begin) + cols_begin);
+	return row_proxy(mem_block, n_cols * (index + reg.rows_begin) + reg.cols_begin);
 }
 
 template<typename T>
 inline typename const matrix<T>::row_proxy matrix<T>::operator[](const int index) const
 {
-	return row_proxy(mem_block, n_cols * (index + rows_begin) + cols_begin);
+	return row_proxy(mem_block, n_cols * (index + reg.rows_begin) + reg.cols_begin);
 }
 
 template<typename T>
-inline matrix<T>& matrix<T>::region(int rows_from, int rows_to, int cols_from, int cols_to)
+inline matrix<T>& matrix<T>::subregion(int rows_from, int rows_to, int cols_from, int cols_to)
 {
 	if (rows_from < 0 || rows_to >= n_rows || cols_from < 0 || cols_to >= n_cols)
 	{
@@ -155,10 +199,10 @@ inline matrix<T>& matrix<T>::region(int rows_from, int rows_to, int cols_from, i
 	}
 
 	continuous = false;
-	rows_begin = rows_from;
-	rows_end = rows_to;
-	cols_begin = cols_from;
-	cols_end = cols_to;
+	reg.rows_begin = rows_from;
+	reg.rows_end = rows_to;
+	reg.cols_begin = cols_from;
+	reg.cols_end = cols_to;
 
 	return *this;
 }
@@ -176,4 +220,18 @@ inline T* matrix<T>::raw()
 	return mem_block.get();
 }
 
+template<typename T>
+inline typename matrix<T>::iterator matrix<T>::begin()
+{
+	return iterator(mem_block, n_rows, n_cols, reg, reg.rows_begin, reg.cols_begin);
 }
+
+template <typename T>
+inline typename matrix<T>::iterator matrix<T>::end()
+{
+	return iterator(mem_block, n_rows, n_cols, reg, -1, -1);
+}
+
+}
+
+#include "matrix_iterators.h"
