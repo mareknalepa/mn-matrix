@@ -47,6 +47,8 @@ public:
 	matrix& operator=(const matrix& m);
 	const int rows() const;
 	const int cols() const;
+	bool is_continuous() const;
+	bool is_square() const;
 	row_proxy operator[](const int index);
 	const row_proxy operator[] (const int index) const;
 	matrix<T> submatrix(int rows_from, int rows_to, int cols_from, int cols_to) const;
@@ -191,6 +193,18 @@ inline const int matrix<T>::cols() const
 		return n_cols;
 	else
 		return reg.cols_end - reg.cols_begin + 1;
+}
+
+template<typename T>
+inline bool matrix<T>::is_continuous() const
+{
+	return continuous;
+}
+
+template<typename T>
+inline bool matrix<T>::is_square() const
+{
+	return rows() == cols();
 }
 
 template<typename T>
