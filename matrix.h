@@ -45,15 +45,29 @@ public:
 	matrix(const matrix& m);
 	matrix(int rows, int cols);
 	matrix& operator=(const matrix& m);
+
 	const int rows() const;
 	const int cols() const;
 	bool is_continuous() const;
 	bool is_square() const;
+
 	row_proxy operator[](const int index);
 	const row_proxy operator[] (const int index) const;
+
+	bool operator==(const matrix<T>& m) const;
+	bool operator!=(const matrix<T>& m) const;
+	matrix<T>& operator+=(const matrix<T>& m);
+	matrix<T>& operator+=(const T& value);
+	matrix<T>& operator-=(const matrix<T>& m);
+	matrix<T>& operator-=(const T& value);
+	matrix<T>& operator*=(const T& value);
+	matrix<T>& operator/=(const T& value);
+	matrix<T> operator*(const matrix<T>& m);
+
 	matrix<T> submatrix(int rows_from, int rows_to, int cols_from, int cols_to) const;
 	matrix<T> copy() const;
 	T* raw();
+
 	iterator begin();
 	const_iterator begin() const;
 	iterator end();
@@ -310,4 +324,5 @@ inline typename matrix<T>::const_iterator matrix<T>::end() const
 
 }
 
+#include "matrix_operators.h"
 #include "matrix_iterators.h"

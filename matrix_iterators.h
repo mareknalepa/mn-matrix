@@ -53,12 +53,7 @@ inline bool matrix<T>::iterator::operator==(const typename matrix<T>::iterator& 
 template<typename T>
 inline bool matrix<T>::iterator::operator!=(const typename matrix<T>::iterator& i) const
 {
-	return !(mem_block == i.mem_block &&
-		n_rows == i.n_rows &&
-		n_cols == i.n_cols &&
-		reg == i.reg &&
-		current_row == i.current_row &&
-		current_col == i.current_col);
+	return !operator==(i);
 }
 
 template<typename T>
@@ -162,12 +157,7 @@ inline bool matrix<T>::const_iterator::operator==(const typename matrix<T>::cons
 template<typename T>
 inline bool matrix<T>::const_iterator::operator!=(const typename matrix<T>::const_iterator& i) const
 {
-	return !(mem_block == i.mem_block &&
-		n_rows == i.n_rows &&
-		n_cols == i.n_cols &&
-		reg == i.reg &&
-		current_row == i.current_row &&
-		current_col == i.current_col);
+	return !operator==(i);
 }
 
 template<typename T>
@@ -192,7 +182,7 @@ inline typename matrix<T>::const_iterator& matrix<T>::const_iterator::operator++
 template<typename T>
 inline typename matrix<T>::const_iterator matrix<T>::const_iterator::operator++(int)
 {
-	iterator old(*this);
+	const_iterator old(*this);
 	++(*this);
 	return old;
 }
@@ -225,7 +215,7 @@ inline typename matrix<T>::const_iterator& matrix<T>::const_iterator::operator--
 template<typename T>
 inline typename matrix<T>::const_iterator matrix<T>::const_iterator::operator--(int)
 {
-	iterator old(*this);
+	const_iterator old(*this);
 	--(*this);
 	return old;
 }
