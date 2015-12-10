@@ -121,4 +121,32 @@ inline matrix<T> matrix<T>::operator*(const matrix<T>& m)
 	return product;
 }
 
+template<typename T>
+inline T matrix<T>::det() const
+{
+	if (!is_square())
+		throw matrix_exception("not square matrix");
+	if (rows() == 1)
+		return (*this)[0][0];
+	if (rows() == 2)
+		return (*this)[0][0] * (*this)[1][1] - (*this)[0][1] * (*this)[1][0];
+
+	T determinant = 0;
+	matrix<T> submatrix(rows() - 1, cols() - 1);
+	for (int col = 0; col < cols(); ++col)
+	{
+		for (int submatrix_col = 0, matrix_col = 0; matrix_col < cols(); ++matrix_col)
+		{
+			if (matrix_col != col)
+			{
+				for (int row = 1; row < rows(); ++row)
+					submatrix[row - 1][submatrix_col] = (*this)[row][matrix_col];
+				++submatrix_col;
+			}
+		}
+		determinant += (*this)[0][col] * pow(-1.0, 2.0 + col) * submatrix.det();
+	}
+	return determinant;
+}
+
 }

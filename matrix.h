@@ -63,6 +63,7 @@ public:
 	matrix<T>& operator*=(const T& value);
 	matrix<T>& operator/=(const T& value);
 	matrix<T> operator*(const matrix<T>& m);
+	T det() const;
 
 	matrix<T> submatrix(int rows_from, int rows_to, int cols_from, int cols_to) const;
 	matrix<T> copy() const;
