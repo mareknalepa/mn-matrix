@@ -30,9 +30,7 @@ inline typename matrix<T>::iterator& matrix<T>::iterator::operator=(const typena
 	if (&i != this)
 	{
 		mem_block = i.mem_block;
-		n_rows = i.n_rows;
-		n_cols = i.n_cols;
-		reg = i.reg;
+		p = i.p;
 		current_row = i.current_row;
 		current_col = i.current_col;
 	}
@@ -43,9 +41,7 @@ template<typename T>
 inline bool matrix<T>::iterator::operator==(const typename matrix<T>::iterator& i) const
 {
 	return (mem_block == i.mem_block &&
-		n_rows == i.n_rows &&
-		n_cols == i.n_cols &&
-		reg == i.reg &&
+		p == i.p &&
 		current_row == i.current_row &&
 		current_col == i.current_col);
 }
@@ -61,16 +57,33 @@ inline typename matrix<T>::iterator& matrix<T>::iterator::operator++()
 {
 	if (current_row == -1 || current_col == -1)
 		return *this;
-	++current_col;
-	if (current_col > reg.cols_end)
+	if (!p.transposed)
 	{
-		current_col = reg.cols_begin;
-		++current_row;
+		++current_col;
+		if (current_col > p.c_end)
+		{
+			current_col = p.c_begin;
+			++current_row;
+		}
+		if (current_row > p.r_end)
+		{
+			current_row = -1;
+			current_col = -1;
+		}
 	}
-	if (current_row > reg.rows_end)
+	else
 	{
-		current_row = -1;
-		current_col = -1;
+		++current_row;
+		if (current_row > p.r_end)
+		{
+			current_row = p.r_begin;
+			++current_col;
+		}
+		if (current_col > p.c_end)
+		{
+			current_row = -1;
+			current_col = -1;
+		}
 	}
 	return *this;
 }
@@ -86,24 +99,41 @@ inline typename matrix<T>::iterator matrix<T>::iterator::operator++(int)
 template<typename T>
 inline typename matrix<T>::iterator& matrix<T>::iterator::operator--()
 {
-	if (current_row == reg.rows_begin && current_col == reg.cols_begin)
+	if (current_row == p.r_begin && current_col == p.c_begin)
 		return *this;
 	if (current_row == -1 || current_col == -1)
 	{
-		current_row = reg.rows_end;
-		current_col = reg.cols_end;
+		current_row = p.r_end;
+		current_col = p.c_end;
 		return *this;
 	}
-	--current_col;
-	if (current_col < reg.cols_begin)
+	if (!p.transposed)
 	{
-		current_col = reg.cols_end;
-		--current_row;
+		--current_col;
+		if (current_col < p.c_begin)
+		{
+			current_col = p.c_end;
+			--current_row;
+		}
+		if (current_row < p.r_begin)
+		{
+			current_row = p.r_begin;
+			current_col = p.c_begin;
+		}
 	}
-	if (current_row < reg.rows_begin)
+	else
 	{
-		current_row = reg.rows_begin;
-		current_col = reg.cols_begin;
+		--current_row;
+		if (current_row < p.r_begin)
+		{
+			current_row = p.r_end;
+			--current_col;
+		}
+		if (current_col < p.c_begin)
+		{
+			current_row = p.r_begin;
+			current_col = p.c_begin;
+		}
 	}
 	return *this;
 }
@@ -119,13 +149,13 @@ inline typename matrix<T>::iterator matrix<T>::iterator::operator--(int)
 template<typename T>
 inline T& matrix<T>::iterator::operator*() const
 {
-	return mem_block.get()[current_row * n_cols + current_col];
+	return mem_block.get()[current_row * p.cols + current_col];
 }
 
 template<typename T>
 inline T* matrix<T>::iterator::operator->() const
 {
-	return &(mem_block.get()[current_row * n_cols + current_col]);
+	return &(mem_block.get()[current_row * p.cols + current_col]);
 }
 
 template<typename T>
@@ -134,9 +164,7 @@ inline typename matrix<T>::const_iterator& matrix<T>::const_iterator::operator=(
 	if (&i != this)
 	{
 		mem_block = i.mem_block;
-		n_rows = i.n_rows;
-		n_cols = i.n_cols;
-		reg = i.reg;
+		p = i.p;
 		current_row = i.current_row;
 		current_col = i.current_col;
 	}
@@ -147,9 +175,7 @@ template<typename T>
 inline bool matrix<T>::const_iterator::operator==(const typename matrix<T>::const_iterator& i) const
 {
 	return (mem_block == i.mem_block &&
-		n_rows == i.n_rows &&
-		n_cols == i.n_cols &&
-		reg == i.reg &&
+		p == i.p &&
 		current_row == i.current_row &&
 		current_col == i.current_col);
 }
@@ -165,16 +191,33 @@ inline typename matrix<T>::const_iterator& matrix<T>::const_iterator::operator++
 {
 	if (current_row == -1 || current_col == -1)
 		return *this;
-	++current_col;
-	if (current_col > reg.cols_end)
+	if (!p.transposed)
 	{
-		current_col = reg.cols_begin;
-		++current_row;
+		++current_col;
+		if (current_col > p.c_end)
+		{
+			current_col = p.c_begin;
+			++current_row;
+		}
+		if (current_row > p.r_end)
+		{
+			current_row = -1;
+			current_col = -1;
+		}
 	}
-	if (current_row > reg.rows_end)
+	else
 	{
-		current_row = -1;
-		current_col = -1;
+		++current_row;
+		if (current_row > p.r_end)
+		{
+			current_row = p.r_begin;
+			++current_col;
+		}
+		if (current_col > p.c_end)
+		{
+			current_row = -1;
+			current_col = -1;
+		}
 	}
 	return *this;
 }
@@ -190,24 +233,41 @@ inline typename matrix<T>::const_iterator matrix<T>::const_iterator::operator++(
 template<typename T>
 inline typename matrix<T>::const_iterator& matrix<T>::const_iterator::operator--()
 {
-	if (current_row == reg.rows_begin && current_col == reg.cols_begin)
+	if (current_row == p.r_begin && current_col == p.c_begin)
 		return *this;
 	if (current_row == -1 || current_col == -1)
 	{
-		current_row = reg.rows_end;
-		current_col = reg.cols_end;
+		current_row = p.r_end;
+		current_col = p.c_end;
 		return *this;
 	}
-	--current_col;
-	if (current_col < reg.cols_begin)
+	if (!p.transposed)
 	{
-		current_col = reg.cols_end;
-		--current_row;
+		--current_col;
+		if (current_col < p.c_begin)
+		{
+			current_col = p.c_end;
+			--current_row;
+		}
+		if (current_row < p.r_begin)
+		{
+			current_row = p.r_begin;
+			current_col = p.c_begin;
+		}
 	}
-	if (current_row < reg.rows_begin)
+	else
 	{
-		current_row = reg.rows_begin;
-		current_col = reg.cols_begin;
+		--current_row;
+		if (current_row < p.r_begin)
+		{
+			current_row = p.r_end;
+			--current_col;
+		}
+		if (current_col < p.c_begin)
+		{
+			current_row = p.r_begin;
+			current_col = p.c_begin;
+		}
 	}
 	return *this;
 }
@@ -223,13 +283,13 @@ inline typename matrix<T>::const_iterator matrix<T>::const_iterator::operator--(
 template<typename T>
 inline const T& matrix<T>::const_iterator::operator*() const
 {
-	return mem_block.get()[current_row * n_cols + current_col];
+	return mem_block.get()[current_row * p.cols + current_col];
 }
 
 template<typename T>
 inline const T* matrix<T>::const_iterator::operator->() const
 {
-	return &(mem_block.get()[current_row * n_cols + current_col]);
+	return &(mem_block.get()[current_row * p.cols + current_col]);
 }
 
 }
