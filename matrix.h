@@ -86,6 +86,11 @@ public:
 	const_iterator begin() const;
 	iterator end();
 	const_iterator end() const;
+
+	template<typename S>
+	friend inline std::istream& operator>>(std::istream& i, matrix<T>& m);
+	template<typename S>
+	friend inline std::ostream& operator<<(std::ostream& o, const matrix<T>& m);
 };
 
 template<typename T>
@@ -489,3 +494,4 @@ inline typename matrix<T>::const_iterator matrix<T>::end() const
 
 #include "matrix_operators.h"
 #include "matrix_iterators.h"
+#include "matrix_io.h"
