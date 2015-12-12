@@ -25,19 +25,6 @@
 namespace mn {
 
 template<typename T>
-inline typename matrix<T>::iterator& matrix<T>::iterator::operator=(const typename matrix<T>::iterator& i)
-{
-	if (&i != this)
-	{
-		mem_block = i.mem_block;
-		p = i.p;
-		current_row = i.current_row;
-		current_col = i.current_col;
-	}
-	return *this;
-}
-
-template<typename T>
 inline bool matrix<T>::iterator::operator==(const typename matrix<T>::iterator& i) const
 {
 	return (mem_block == i.mem_block &&
@@ -57,34 +44,18 @@ inline typename matrix<T>::iterator& matrix<T>::iterator::operator++()
 {
 	if (current_row == -1 || current_col == -1)
 		return *this;
-	if (!p.transposed)
+	++current_col;
+	if (current_col > p.c_end)
 	{
-		++current_col;
-		if (current_col > p.c_end)
-		{
-			current_col = p.c_begin;
-			++current_row;
-		}
-		if (current_row > p.r_end)
-		{
-			current_row = -1;
-			current_col = -1;
-		}
-	}
-	else
-	{
+		current_col = p.c_begin;
 		++current_row;
-		if (current_row > p.r_end)
-		{
-			current_row = p.r_begin;
-			++current_col;
-		}
-		if (current_col > p.c_end)
-		{
-			current_row = -1;
-			current_col = -1;
-		}
 	}
+	if (current_row > p.r_end)
+	{
+		current_row = -1;
+		current_col = -1;
+	}
+
 	return *this;
 }
 
@@ -107,34 +78,18 @@ inline typename matrix<T>::iterator& matrix<T>::iterator::operator--()
 		current_col = p.c_end;
 		return *this;
 	}
-	if (!p.transposed)
+	--current_col;
+	if (current_col < p.c_begin)
 	{
-		--current_col;
-		if (current_col < p.c_begin)
-		{
-			current_col = p.c_end;
-			--current_row;
-		}
-		if (current_row < p.r_begin)
-		{
-			current_row = p.r_begin;
-			current_col = p.c_begin;
-		}
-	}
-	else
-	{
+		current_col = p.c_end;
 		--current_row;
-		if (current_row < p.r_begin)
-		{
-			current_row = p.r_end;
-			--current_col;
-		}
-		if (current_col < p.c_begin)
-		{
-			current_row = p.r_begin;
-			current_col = p.c_begin;
-		}
 	}
+	if (current_row < p.r_begin)
+	{
+		current_row = p.r_begin;
+		current_col = p.c_begin;
+	}
+	
 	return *this;
 }
 
@@ -159,19 +114,6 @@ inline T* matrix<T>::iterator::operator->() const
 }
 
 template<typename T>
-inline typename matrix<T>::const_iterator& matrix<T>::const_iterator::operator=(const typename matrix<T>::const_iterator& i)
-{
-	if (&i != this)
-	{
-		mem_block = i.mem_block;
-		p = i.p;
-		current_row = i.current_row;
-		current_col = i.current_col;
-	}
-	return *this;
-}
-
-template<typename T>
 inline bool matrix<T>::const_iterator::operator==(const typename matrix<T>::const_iterator& i) const
 {
 	return (mem_block == i.mem_block &&
@@ -191,34 +133,18 @@ inline typename matrix<T>::const_iterator& matrix<T>::const_iterator::operator++
 {
 	if (current_row == -1 || current_col == -1)
 		return *this;
-	if (!p.transposed)
+	++current_col;
+	if (current_col > p.c_end)
 	{
-		++current_col;
-		if (current_col > p.c_end)
-		{
-			current_col = p.c_begin;
-			++current_row;
-		}
-		if (current_row > p.r_end)
-		{
-			current_row = -1;
-			current_col = -1;
-		}
-	}
-	else
-	{
+		current_col = p.c_begin;
 		++current_row;
-		if (current_row > p.r_end)
-		{
-			current_row = p.r_begin;
-			++current_col;
-		}
-		if (current_col > p.c_end)
-		{
-			current_row = -1;
-			current_col = -1;
-		}
 	}
+	if (current_row > p.r_end)
+	{
+		current_row = -1;
+		current_col = -1;
+	}
+
 	return *this;
 }
 
@@ -241,34 +167,18 @@ inline typename matrix<T>::const_iterator& matrix<T>::const_iterator::operator--
 		current_col = p.c_end;
 		return *this;
 	}
-	if (!p.transposed)
+	--current_col;
+	if (current_col < p.c_begin)
 	{
-		--current_col;
-		if (current_col < p.c_begin)
-		{
-			current_col = p.c_end;
-			--current_row;
-		}
-		if (current_row < p.r_begin)
-		{
-			current_row = p.r_begin;
-			current_col = p.c_begin;
-		}
-	}
-	else
-	{
+		current_col = p.c_end;
 		--current_row;
-		if (current_row < p.r_begin)
-		{
-			current_row = p.r_end;
-			--current_col;
-		}
-		if (current_col < p.c_begin)
-		{
-			current_row = p.r_begin;
-			current_col = p.c_begin;
-		}
 	}
+	if (current_row < p.r_begin)
+	{
+		current_row = p.r_begin;
+		current_col = p.c_begin;
+	}
+	
 	return *this;
 }
 

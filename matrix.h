@@ -78,10 +78,10 @@ class matrix<T>::properties
 {
 public:
 	properties() :
-		rows(1), cols(1), r_begin(0), r_end(0), c_begin(0), c_end(0), continuous(true), transposed(false) {}
+		rows(1), cols(1), r_begin(0), r_end(0), c_begin(0), c_end(0), continuous(true) {}
 	properties(int rows, int cols) :
-		rows(rows), cols(cols), r_begin(0), r_end(rows - 1), c_begin(0), c_end(cols - 1), continuous(true), transposed(false) {}
-	bool operator==(const properties& p) const { return rows == p.rows && cols == p.cols && r_begin == p.r_begin && r_end == p.r_end && c_begin == p.c_begin && c_end == p.c_end && continuous == p.continuous && transposed == p.transposed; }
+		rows(rows), cols(cols), r_begin(0), r_end(rows - 1), c_begin(0), c_end(cols - 1), continuous(true) {}
+	bool operator==(const properties& p) const { return rows == p.rows && cols == p.cols && r_begin == p.r_begin && r_end == p.r_end && c_begin == p.c_begin && c_end == p.c_end && continuous == p.continuous; }
 	bool operator!=(const properties& p) const { return !operator==(p); }
 	int rows;
 	int cols;
@@ -90,7 +90,6 @@ public:
 	int c_begin;
 	int c_end;
 	bool continuous;
-	bool transposed;
 };
 
 template<typename T>
@@ -119,9 +118,6 @@ public:
 		mem_block(std::nullptr_t(0)), current_row(-1), current_col(-1) {}
 	iterator(std::shared_ptr<T> mem_block, typename matrix<T>::properties p, int row, int col) :
 		mem_block(mem_block), p(p), current_row(row), current_col(col) {}
-	iterator(const iterator& i) :
-		mem_block(i.mem_block), p(i.p), current_row(i.current_row), current_col(i.current_col) {}
-	iterator& operator=(const iterator& i);
 	bool operator==(const iterator& i) const;
 	bool operator!=(const iterator& i) const;
 	iterator& operator++();
@@ -149,7 +145,6 @@ public:
 		mem_block(i.mem_block), p(i.p), current_row(i.current_row), current_col(i.current_col) {}
 	const_iterator(const typename matrix<T>::iterator& i):
 		mem_block(i.mem_block), p(i.p), current_row(i.current_row), current_col(i.current_col) {}
-	const_iterator& operator=(const const_iterator& i);
 	bool operator==(const const_iterator& i) const;
 	bool operator!=(const const_iterator& i) const;
 	const_iterator& operator++();
@@ -192,31 +187,13 @@ inline matrix<T>& matrix<T>::operator=(const matrix& m)
 template<typename T>
 inline const int matrix<T>::rows() const
 {
-	if (!p.transposed)
-		if (p.continuous)
-			return p.rows;
-		else
-			return p.r_end - p.r_begin + 1;
-	else
-		if (p.continuous)
-			return p.cols;
-		else
-			return p.c_end - p.c_begin + 1;
+	return p.r_end - p.r_begin + 1;
 }
 
 template<typename T>
 inline const int matrix<T>::cols() const
 {
-	if (!p.transposed)
-		if (p.continuous)
-			return p.cols;
-		else
-			return p.c_end - p.c_begin + 1;
-	else
-		if (p.continuous)
-			return p.rows;
-		else
-			return p.r_end - p.r_begin + 1;
+	return p.c_end - p.c_begin + 1;
 }
 
 template<typename T>
@@ -234,16 +211,12 @@ inline bool matrix<T>::is_square() const
 template<typename T>
 inline T& matrix<T>::row_proxy::operator[](const int index)
 {
-	if (p.transposed)
-		return mem_block.get()[p.cols * (index + p.r_begin) + p.c_begin + row];
 	return mem_block.get()[p.cols * (row + p.r_begin) + p.c_begin + index];
 }
 
 template<typename T>
 inline const T& matrix<T>::row_proxy::operator[](const int index) const
 {
-	if (p.transposed)
-		return mem_block.get()[p.cols * (index + p.r_begin) + p.c_begin + row];
 	return mem_block.get()[p.cols * (row + p.r_begin) + p.c_begin + index];
 }
 
@@ -263,39 +236,30 @@ template<typename T>
 inline matrix<T> matrix<T>::submatrix(int rows_from, int rows_to, int cols_from, int cols_to) const
 {
 	matrix<T> subm = matrix(*this);
-	if (!p.transposed)
-	{
-		if (rows_from < 0 || rows_to >= p.rows || cols_from < 0 || cols_to >= p.cols)
-			throw matrix_exception("region out of bounds");
-		if (rows_from > rows_to || cols_from > cols_to)
-			throw matrix_exception("invalid region");
-		subm.p.continuous = false;
-		subm.p.r_begin = rows_from;
-		subm.p.r_end = rows_to;
-		subm.p.c_begin = cols_from;
-		subm.p.c_end = cols_to;
-	}
-	else
-	{
-		if (rows_from < 0 || rows_to >= p.cols || cols_from < 0 || cols_to >= p.rows)
-			throw matrix_exception("region out of bounds");
-		if (rows_from > rows_to || cols_from > cols_to)
-			throw matrix_exception("invalid region");
-		subm.p.continuous = false;
-		subm.p.c_begin = rows_from;
-		subm.p.c_end = rows_to;
-		subm.p.r_begin = cols_from;
-		subm.p.r_end = cols_to;
-	}
-	
+	if (rows_from < 0 || rows_to >= p.rows || cols_from < 0 || cols_to >= p.cols)
+		throw matrix_exception("region out of bounds");
+	if (rows_from > rows_to || cols_from > cols_to)
+		throw matrix_exception("invalid region");
+	subm.p.continuous = false;
+	subm.p.r_begin = rows_from;
+	subm.p.r_end = rows_to;
+	subm.p.c_begin = cols_from;
+	subm.p.c_end = cols_to;
+
 	return subm;
 }
 
 template<typename T>
 inline matrix<T> matrix<T>::transpose() const
 {
-	matrix<T> transposed = matrix(*this);
-	transposed.p.transposed = !p.transposed;
+	matrix<T> transposed = matrix<T>(cols(), rows());
+	for (int row = 0; row < rows(); ++row)
+	{
+		for (int col = 0; col < cols(); ++col)
+		{
+			transposed[col][row] = (*this)[row][col];
+		}
+	}
 
 	return transposed;
 }
@@ -304,21 +268,16 @@ template<typename T>
 inline matrix<T> matrix<T>::copy() const
 {
 	matrix<T> copy = matrix<T>(rows(), cols());
-	if (p.continuous && !p.transposed)
-		std::memcpy(mem_block.get(), copy.mem_block.get(), p.rows * p.cols * sizeof(T));
-	else
+	int row = 0;
+	int col = 0;
+	for (auto i = begin(); i != end(); ++i)
 	{
-		int row = 0;
-		int col = 0;
-		for (auto i = begin(); i != end(); ++i)
+		copy[row][col] = *i;
+		++col;
+		if (col == cols())
 		{
-			copy[row][col] = *i;
-			++col;
-			if (col == cols())
-			{
-				col = 0;
-				++row;
-			}
+			col = 0;
+			++row;
 		}
 	}
 
