@@ -242,12 +242,12 @@ inline typename matrix<T>::element_iterator& matrix<T>::element_iterator::operat
 	if (horizontal)
 	{
 		if (c_index > p.c_begin)
-			++c_index;
+			--c_index;
 	}
 	else
 	{
 		if (r_index > p.r_begin)
-			++r_index;
+			--r_index;
 	}
 	return *this;
 }
@@ -302,12 +302,12 @@ inline typename matrix<T>::const_element_iterator& matrix<T>::const_element_iter
 	if (horizontal)
 	{
 		if (c_index > p.c_begin)
-			++c_index;
+			--c_index;
 	}
 	else
 	{
 		if (r_index > p.r_begin)
-			++r_index;
+			--r_index;
 	}
 	return *this;
 }
