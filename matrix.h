@@ -30,26 +30,41 @@ template<typename T>
 class matrix
 {
 public:
+	class row_iterator;
+	class const_row_iterator;
+	class col_iterator;
+	class const_col_iterator;
+	class element_iterator;
+	class const_element_iterator;
 	class iterator;
 	class const_iterator;
 protected:
 	class properties;
-	class row_proxy;
 	std::shared_ptr<T> mem_block;
 	properties p;
 public:
 	matrix();
-	matrix(const matrix& m);
 	matrix(int rows, int cols);
-	matrix& operator=(const matrix& m);
 
 	const int rows() const;
 	const int cols() const;
 	bool is_continuous() const;
 	bool is_square() const;
 
-	row_proxy operator[](const int index);
-	const row_proxy operator[] (const int index) const;
+	row_iterator operator[](const int index);
+	const_row_iterator operator[](const int index) const;
+	row_iterator first_row();
+	const_row_iterator first_row() const;
+	row_iterator last_row();
+	const_row_iterator last_row() const;
+	col_iterator first_col();
+	const_col_iterator first_col() const;
+	col_iterator last_col();
+	const_col_iterator last_col() const;
+	row_iterator row(const int index);
+	const_row_iterator row(const int index) const;
+	col_iterator col(const int index);
+	const_col_iterator col(const int index) const;
 
 	bool operator==(const matrix<T>& m) const;
 	bool operator!=(const matrix<T>& m) const;
@@ -93,16 +108,129 @@ public:
 };
 
 template<typename T>
-class matrix<T>::row_proxy
+class matrix<T>::row_iterator
 {
 private:
-	const std::shared_ptr<T>& mem_block;
-	const typename matrix<T>::properties& p;
-	const int row;
+	const std::shared_ptr<T> mem_block;
+	const typename matrix<T>::properties p;
+	int r_index;
 public:
-	row_proxy(const std::shared_ptr<T>& mem_block, const typename matrix<T>::properties& p, const int row) : mem_block(mem_block), p(p), row(row) {}
+	row_iterator() : r_index(-1) {}
+	row_iterator(std::shared_ptr<T> mem_block, typename matrix<T>::properties p, int row) : mem_block(mem_block), p(p), r_index(row) {}
+	bool operator==(const row_iterator& r) const { return mem_block == r.mem_block && p == r.p && r_index == r.r_index; }
+	bool operator!=(const row_iterator& r) const { return !operator==(r); }
+	row_iterator& operator++();
+	row_iterator operator++(int);
+	row_iterator& operator--();
+	row_iterator operator--(int);
 	T& operator[](const int index);
-	const T& operator[] (const int index) const;
+	typename matrix<T>::element_iterator first_element();
+	typename matrix<T>::element_iterator last_element();
+};
+
+template<typename T>
+class matrix<T>::const_row_iterator
+{
+private:
+	const std::shared_ptr<T> mem_block;
+	const typename matrix<T>::properties p;
+	int r_index;
+public:
+	const_row_iterator() : r_index(-1) {}
+	const_row_iterator(std::shared_ptr<T> mem_block, typename matrix<T>::properties p, int row) : mem_block(mem_block), p(p), r_index(row) {}
+	bool operator==(const const_row_iterator& r) const { return mem_block == r.mem_block && p == r.p && r_index == r.r_index; }
+	bool operator!=(const const_row_iterator& r) const { return !operator==(r); };
+	const_row_iterator& operator++();
+	const_row_iterator operator++(int);
+	const_row_iterator& operator--();
+	const_row_iterator operator--(int);
+	const T& operator[](const int index);
+	typename matrix<T>::const_element_iterator first_element();
+	typename matrix<T>::const_element_iterator last_element();
+};
+
+template<typename T>
+class matrix<T>::col_iterator
+{
+private:
+	const std::shared_ptr<T> mem_block;
+	const typename matrix<T>::properties p;
+	int c_index;
+public:
+	col_iterator() : c_index(-1) {}
+	col_iterator(std::shared_ptr<T> mem_block, typename matrix<T>::properties p, int col) : mem_block(mem_block), p(p), c_index(col) {}
+	bool operator==(const col_iterator& c) const { return mem_block == c.mem_block && p == c.p && c_index == c.c_index; }
+	bool operator!=(const col_iterator& c) const { return !operator==(c); }
+	col_iterator& operator++();
+	col_iterator operator++(int);
+	col_iterator& operator--();
+	col_iterator operator--(int);
+	typename matrix<T>::element_iterator first_element();
+	typename matrix<T>::element_iterator last_element();
+};
+
+template<typename T>
+class matrix<T>::const_col_iterator
+{
+private:
+	const std::shared_ptr<T> mem_block;
+	const typename matrix<T>::properties p;
+	int c_index;
+public:
+	const_col_iterator() : c_index(-1) {}
+	const_col_iterator(std::shared_ptr<T> mem_block, typename matrix<T>::properties p, int col) : mem_block(mem_block), p(p), c_index(col) {}
+	bool operator==(const const_col_iterator& c) const { return mem_block == c.mem_block && p == c.p && c_index == c.c_index; }
+	bool operator!=(const const_col_iterator& c) const { return !operator==(c); };
+	const_col_iterator& operator++();
+	const_col_iterator operator++(int);
+	const_col_iterator& operator--();
+	const_col_iterator operator--(int);
+	typename matrix<T>::const_element_iterator first_element();
+	typename matrix<T>::const_element_iterator last_element();
+};
+
+template<typename T>
+class matrix<T>::element_iterator
+{
+private:
+	const std::shared_ptr<T> mem_block;
+	const typename matrix<T>::properties p;
+	bool horizontal;
+	int r_index;
+	int c_index;
+public:
+	element_iterator() : horizontal(true), r_index(-1), c_index(-1) {}
+	element_iterator(std::shared_ptr<T> mem_block, typename matrix<T>::properties p, bool h, int row, int col) : mem_block(mem_block), p(p), horizontal(h), r_index(row), c_index(col) {}
+	bool operator==(const element_iterator& e) const { return mem_block == e.mem_block && p == e.p && horizontal == e.horizontal && r_index == e.r_index && c_index == e.c_index; }
+	bool operator!=(const element_iterator& e) const { return !operator==(e); }
+	element_iterator& operator++();
+	element_iterator operator++(int);
+	element_iterator& operator--();
+	element_iterator operator--(int);
+	T& operator*() const;
+	T* operator->() const;
+};
+
+template<typename T>
+class matrix<T>::const_element_iterator
+{
+private:
+	const std::shared_ptr<T> mem_block;
+	const typename matrix<T>::properties p;
+	bool horizontal;
+	int r_index;
+	int c_index;
+public:
+	const_element_iterator() : horizontal(true), r_index(-1), c_index(-1) {}
+	const_element_iterator(std::shared_ptr<T> mem_block, typename matrix<T>::properties p, bool h, int row, int col) : mem_block(mem_block), p(p), horizontal(h), r_index(row), c_index(col) {}
+	bool operator==(const const_element_iterator& e) const { return mem_block == e.mem_block && p == e.p && horizontal == e.horizontal && r_index == e.r_index && c_index == e.c_index; }
+	bool operator!=(const const_element_iterator& e) const { return !operator==(e); }
+	const_element_iterator& operator++();
+	const_element_iterator operator++(int);
+	const_element_iterator& operator--();
+	const_element_iterator operator--(int);
+	const T& operator*() const;
+	const T* operator->() const;
 };
 
 template<typename T>
@@ -162,26 +290,9 @@ inline matrix<T>::matrix() :
 }
 
 template<typename T>
-inline matrix<T>::matrix(const matrix& m) :
-	mem_block(m.mem_block), p(m.p)
-{
-}
-
-template<typename T>
 inline matrix<T>::matrix(int rows, int cols) :
 	mem_block(new T[rows * cols], [](T* ptr) { delete[] ptr; }), p(rows, cols)
 {
-}
-
-template<typename T>
-inline matrix<T>& matrix<T>::operator=(const matrix& m)
-{
-	if (&m != this)
-	{
-		mem_block = m.mem_block;
-		p = m.p;
-	}
-	return *this;
 }
 
 template<typename T>
@@ -209,27 +320,87 @@ inline bool matrix<T>::is_square() const
 }
 
 template<typename T>
-inline T& matrix<T>::row_proxy::operator[](const int index)
+inline typename matrix<T>::row_iterator matrix<T>::operator[](const int index)
 {
-	return mem_block.get()[p.cols * (row + p.r_begin) + p.c_begin + index];
+	return row(index);
 }
 
 template<typename T>
-inline const T& matrix<T>::row_proxy::operator[](const int index) const
+inline typename matrix<T>::const_row_iterator matrix<T>::operator[](const int index) const
 {
-	return mem_block.get()[p.cols * (row + p.r_begin) + p.c_begin + index];
+	return row(index);
 }
 
 template<typename T>
-inline typename matrix<T>::row_proxy matrix<T>::operator[](const int index)
+inline typename matrix<T>::row_iterator matrix<T>::first_row()
 {
-	return row_proxy(mem_block, p, index);
+	return row_iterator(mem_block, p, p.r_begin);
 }
 
 template<typename T>
-inline typename const matrix<T>::row_proxy matrix<T>::operator[](const int index) const
+inline typename matrix<T>::const_row_iterator matrix<T>::first_row() const
 {
-	return row_proxy(mem_block, p, index);
+	return const_row_iterator(mem_block, p, p.r_begin);
+}
+
+template<typename T>
+inline typename matrix<T>::row_iterator matrix<T>::last_row()
+{
+	return row_iterator(mem_block, p, p.r_end + 1);
+}
+
+template<typename T>
+inline typename matrix<T>::const_row_iterator matrix<T>::last_row() const
+{
+	return const_row_iterator(mem_block, p, p.r_end + 1);
+}
+
+template<typename T>
+inline typename matrix<T>::col_iterator matrix<T>::first_col()
+{
+	return col_iterator(mem_block, p, p.c_begin);
+}
+
+template<typename T>
+inline typename matrix<T>::const_col_iterator matrix<T>::first_col() const
+{
+	return const_col_iterator(mem_block, p, p.c_begin);
+}
+
+template<typename T>
+inline typename matrix<T>::col_iterator matrix<T>::last_col()
+{
+	return col_iterator(mem_block, p, p.c_end + 1);
+}
+
+template<typename T>
+inline typename matrix<T>::const_col_iterator matrix<T>::last_col() const
+{
+	return const_col_iterator(mem_block, p, p.c_end + 1);
+}
+
+template<typename T>
+inline typename matrix<T>::row_iterator matrix<T>::row(const int index)
+{
+	return row_iterator(mem_block, p, p.r_begin + index);
+}
+
+template<typename T>
+inline typename matrix<T>::const_row_iterator matrix<T>::row(const int index) const
+{
+	return const_row_iterator(mem_block, p, p.r_begin + index);
+}
+
+template<typename T>
+inline typename matrix<T>::col_iterator matrix<T>::col(const int index)
+{
+	return col_iterator(mem_block, p, p.c_begin + index);
+}
+
+template<typename T>
+inline typename matrix<T>::const_col_iterator matrix<T>::col(const int index) const
+{
+	return const_col_iterator(mem_block, p, p.c_begin + index);
 }
 
 template<typename T>

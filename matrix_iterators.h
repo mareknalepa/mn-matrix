@@ -25,6 +25,314 @@
 namespace mn {
 
 template<typename T>
+inline typename matrix<T>::row_iterator& matrix<T>::row_iterator::operator++()
+{
+	if (r_index < p.r_end + 1)
+		++r_index;
+	return *this;
+}
+
+template<typename T>
+inline typename matrix<T>::row_iterator matrix<T>::row_iterator::operator++(int)
+{
+	row_iterator old(*this);
+	++(*this);
+	return old;
+}
+
+template<typename T>
+inline typename matrix<T>::row_iterator& matrix<T>::row_iterator::operator--()
+{
+	if (r_index > p.r_begin)
+		--r_index;
+	return *this;
+}
+
+template<typename T>
+inline typename matrix<T>::row_iterator matrix<T>::row_iterator::operator--(int)
+{
+	row_iterator old(*this);
+	--(*this);
+	return old;
+}
+
+template<typename T>
+inline T& matrix<T>::row_iterator::operator[](const int index)
+{
+	return mem_block.get()[p.cols * r_index + p.c_begin + index];
+}
+
+template<typename T>
+inline typename matrix<T>::element_iterator matrix<T>::row_iterator::first_element()
+{
+	return matrix<T>::element_iterator(mem_block, p, true, r_index, p.c_begin);
+}
+
+template<typename T>
+inline typename matrix<T>::element_iterator matrix<T>::row_iterator::last_element()
+{
+	return matrix<T>::element_iterator(mem_block, p, true, r_index, p.c_end + 1);
+}
+
+template<typename T>
+inline typename matrix<T>::const_row_iterator& matrix<T>::const_row_iterator::operator++()
+{
+	if (r_index < p.r_end + 1)
+		++r_index;
+	return *this;
+}
+
+template<typename T>
+inline typename matrix<T>::const_row_iterator matrix<T>::const_row_iterator::operator++(int)
+{
+	const_row_iterator old(*this);
+	++(*this);
+	return old;
+}
+
+template<typename T>
+inline typename matrix<T>::const_row_iterator& matrix<T>::const_row_iterator::operator--()
+{
+	if (r_index > p.r_begin)
+		--r_index;
+	return *this;
+}
+
+template<typename T>
+inline typename matrix<T>::const_row_iterator matrix<T>::const_row_iterator::operator--(int)
+{
+	const_row_iterator old(*this);
+	--(*this);
+	return old;
+}
+
+template<typename T>
+inline const T& matrix<T>::const_row_iterator::operator[](const int index)
+{
+	return mem_block.get()[p.cols * r_index + p.c_begin + index];
+}
+
+template<typename T>
+inline typename matrix<T>::const_element_iterator matrix<T>::const_row_iterator::first_element()
+{
+	return matrix<T>::const_element_iterator(mem_block, p, true, r_index, p.c_begin);
+}
+
+template<typename T>
+inline typename matrix<T>::const_element_iterator matrix<T>::const_row_iterator::last_element()
+{
+	return matrix<T>::const_element_iterator(mem_block, p, true, r_index, p.c_end + 1);
+}
+
+template<typename T>
+inline typename matrix<T>::col_iterator& matrix<T>::col_iterator::operator++()
+{
+	if (c_index < p.c_end + 1)
+		++c_index;
+	return *this;
+}
+
+template<typename T>
+inline typename matrix<T>::col_iterator matrix<T>::col_iterator::operator++(int)
+{
+	col_iterator old(*this);
+	++(*this);
+	return old;
+}
+
+template<typename T>
+inline typename matrix<T>::col_iterator& matrix<T>::col_iterator::operator--()
+{
+	if (c_index > p.c_begin)
+		--c_index;
+	return *this;
+}
+
+template<typename T>
+inline typename matrix<T>::col_iterator matrix<T>::col_iterator::operator--(int)
+{
+	col_iterator old(*this);
+	--(*this);
+	return old;
+}
+
+template<typename T>
+inline typename matrix<T>::element_iterator matrix<T>::col_iterator::first_element()
+{
+	return matrix<T>::element_iterator(mem_block, p, false, p.r_begin, c_index);
+}
+
+template<typename T>
+inline typename matrix<T>::element_iterator matrix<T>::col_iterator::last_element()
+{
+	return matrix<T>::element_iterator(mem_block, p, false, p.r_end + 1, c_index);
+}
+
+template<typename T>
+inline typename matrix<T>::const_col_iterator& matrix<T>::const_col_iterator::operator++()
+{
+	if (c_index < p.c_end + 1)
+		++c_index;
+	return *this;
+}
+
+template<typename T>
+inline typename matrix<T>::const_col_iterator matrix<T>::const_col_iterator::operator++(int)
+{
+	const_col_iterator old(*this);
+	++(*this);
+	return old;
+}
+
+template<typename T>
+inline typename matrix<T>::const_col_iterator& matrix<T>::const_col_iterator::operator--()
+{
+	if (c_index > p.c_begin)
+		--c_index;
+	return *this;
+}
+
+template<typename T>
+inline typename matrix<T>::const_col_iterator matrix<T>::const_col_iterator::operator--(int)
+{
+	const_col_iterator old(*this);
+	--(*this);
+	return old;
+}
+
+template<typename T>
+inline typename matrix<T>::const_element_iterator matrix<T>::const_col_iterator::first_element()
+{
+	return matrix<T>::const_element_iterator(mem_block, p, false, p.r_begin, c_index);
+}
+
+template<typename T>
+inline typename matrix<T>::const_element_iterator matrix<T>::const_col_iterator::last_element()
+{
+	return matrix<T>::const_element_iterator(mem_block, p, false, p.r_end + 1, c_index);
+}
+
+template<typename T>
+inline typename matrix<T>::element_iterator& matrix<T>::element_iterator::operator++()
+{
+	if (horizontal)
+	{
+		if (c_index < p.c_end + 1)
+			++c_index;
+	}
+	else
+	{
+		if (r_index < p.r_end + 1)
+			++r_index;
+	}
+	return *this;
+}
+
+template<typename T>
+inline typename matrix<T>::element_iterator matrix<T>::element_iterator::operator++(int)
+{
+	element_iterator old(*this);
+	++(*this);
+	return old;
+}
+
+template<typename T>
+inline typename matrix<T>::element_iterator& matrix<T>::element_iterator::operator--()
+{
+	if (horizontal)
+	{
+		if (c_index > p.c_begin)
+			++c_index;
+	}
+	else
+	{
+		if (r_index > p.r_begin)
+			++r_index;
+	}
+	return *this;
+}
+
+template<typename T>
+inline typename matrix<T>::element_iterator matrix<T>::element_iterator::operator--(int)
+{
+	element_iterator old(*this);
+	--(*this);
+	return old;
+}
+
+template<typename T>
+inline T& matrix<T>::element_iterator::operator*() const
+{
+	return mem_block.get()[p.cols * r_index + c_index];
+}
+
+template<typename T>
+inline T* matrix<T>::element_iterator::operator->() const
+{
+	return &(mem_block.get()[p.cols * r_index + c_index]);
+}
+
+template<typename T>
+inline typename matrix<T>::const_element_iterator& matrix<T>::const_element_iterator::operator++()
+{
+	if (horizontal)
+	{
+		if (c_index < p.c_end + 1)
+			++c_index;
+	}
+	else
+	{
+		if (r_index < p.r_end + 1)
+			++r_index;
+	}
+	return *this;
+}
+
+template<typename T>
+inline typename matrix<T>::const_element_iterator matrix<T>::const_element_iterator::operator++(int)
+{
+	element_iterator old(*this);
+	++(*this);
+	return old;
+}
+
+template<typename T>
+inline typename matrix<T>::const_element_iterator& matrix<T>::const_element_iterator::operator--()
+{
+	if (horizontal)
+	{
+		if (c_index > p.c_begin)
+			++c_index;
+	}
+	else
+	{
+		if (r_index > p.r_begin)
+			++r_index;
+	}
+	return *this;
+}
+
+template<typename T>
+inline typename matrix<T>::const_element_iterator matrix<T>::const_element_iterator::operator--(int)
+{
+	element_iterator old(*this);
+	--(*this);
+	return old;
+}
+
+template<typename T>
+inline const T& matrix<T>::const_element_iterator::operator*() const
+{
+	return mem_block.get()[p.cols * r_index + c_index];
+}
+
+template<typename T>
+inline const T* matrix<T>::const_element_iterator::operator->() const
+{
+	return &(mem_block.get()[p.cols * r_index + c_index]);
+}
+	
+template<typename T>
 inline bool matrix<T>::iterator::operator==(const typename matrix<T>::iterator& i) const
 {
 	return (mem_block == i.mem_block &&
