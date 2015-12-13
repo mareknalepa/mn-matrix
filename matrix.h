@@ -46,6 +46,17 @@ public:
 	matrix();
 	matrix(int rows, int cols);
 
+	static matrix<T> zeros(int rows, int cols);
+	static matrix<T> zeros(int rows_cols);
+	static matrix<T> ones(int rows, int cols);
+	static matrix<T> ones(int rows_cols);
+	static matrix<T> identity(int rows_cols);
+
+	template<typename R>
+	static matrix<T> rand(int rows, int cols, R& random_distribution);
+	template<typename R>
+	static matrix<T> rand(int rows_cols, R& random_distribution);
+
 	const int rows() const;
 	const int cols() const;
 	bool is_continuous() const;
@@ -492,6 +503,7 @@ inline typename matrix<T>::const_iterator matrix<T>::end() const
 
 }
 
+#include "matrix_generators.h"
 #include "matrix_operators.h"
 #include "matrix_iterators.h"
 #include "matrix_io.h"

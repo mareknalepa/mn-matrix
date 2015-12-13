@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include <memory>
-
 namespace mn {
 
 template<typename T>
