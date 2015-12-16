@@ -79,17 +79,30 @@ public:
 
 	bool operator==(const matrix<T>& m) const;
 	bool operator!=(const matrix<T>& m) const;
+
+	matrix<T> operator+(const matrix<T>& m) const;
+	matrix<T> operator+(const T& value) const;
 	matrix<T>& operator+=(const matrix<T>& m);
 	matrix<T>& operator+=(const T& value);
+
+	matrix<T> operator-(const matrix<T>& m) const;
+	matrix<T> operator-(const T& value) const;
 	matrix<T>& operator-=(const matrix<T>& m);
 	matrix<T>& operator-=(const T& value);
+
+	matrix<T> operator*(const matrix<T>& m) const;
+	matrix<T> operator*(const T& value) const;
 	matrix<T>& operator*=(const T& value);
+
+	matrix<T> operator/(const T& value) const;
 	matrix<T>& operator/=(const T& value);
-	matrix<T> operator*(const matrix<T>& m);
+
 	T det() const;
 
 	matrix<T> submatrix(int rows_from, int rows_to, int cols_from, int cols_to) const;
 	matrix<T> transpose() const;
+	matrix<T> append_h(matrix<T> m) const;
+	matrix<T> append_v(matrix<T> m) const;
 	matrix<T> copy() const;
 	T* raw();
 
@@ -353,6 +366,7 @@ inline typename matrix<T>::row_iterator matrix<T>::first_row()
 	return row_iterator(mem_block, p, p.r_begin);
 }
 
+
 template<typename T>
 inline typename matrix<T>::const_row_iterator matrix<T>::first_row() const
 {
@@ -440,32 +454,120 @@ template<typename T>
 inline matrix<T> matrix<T>::transpose() const
 {
 	matrix<T> transposed = matrix<T>(cols(), rows());
-	for (int row = 0; row < rows(); ++row)
+	auto src_row = first_row();
+	auto dst_col = transposed.first_col();
+	while (src_row != last_row() && dst_col != transposed.last_col())
 	{
-		for (int col = 0; col < cols(); ++col)
+		auto src_element = src_row.first_element();
+		auto dst_element = dst_col.first_element();
+		while (src_element != src_row.last_element() && dst_element != dst_col.last_element())
 		{
-			transposed[col][row] = (*this)[row][col];
+			*dst_element = *src_element;
+			++src_element;
+			++dst_element;
 		}
+		++src_row;
+		++dst_col;
 	}
 
 	return transposed;
 }
 
 template<typename T>
+inline matrix<T> matrix<T>::append_h(matrix<T> m) const
+{
+	int rows_n = (rows() > m.rows()) ? rows() : m.rows();
+	matrix<T> appended(rows_n, cols() + m.cols());
+	for (int r = 0; r < rows(); ++r)
+	{
+		for (int c = 0; c < cols(); ++c)
+		{
+			appended[r][c] = (*this)[r][c];
+		}
+	}
+	for (int r = 0; r < m.rows(); ++r)
+	{
+		for (int c = 0; c < m.cols(); ++c)
+		{
+			appended[r][c + cols()] = m[r][c];
+		}
+	}
+	if (rows() > m.rows())
+	{
+		for (int r = m.rows(); r < appended.rows(); ++r)
+		{
+			for (int c = cols(); c < appended.cols(); ++c)
+			{
+				appended[r][c] = 0;
+			}
+		}
+	}
+	else
+	{
+		for (int r = rows(); r < appended.rows(); ++r)
+		{
+			for (int c = 0; c < cols(); ++c)
+			{
+				appended[r][c] = 0;
+			}
+		}
+	}
+
+	return appended;
+}
+
+template<typename T>
+inline matrix<T> matrix<T>::append_v(matrix<T> m) const
+{
+	int cols_n = (cols() > m.cols()) ? cols() : m.cols();
+	matrix<T> appended(rows() + m.rows(), cols_n);
+	for (int r = 0; r < rows(); ++r)
+	{
+		for (int c = 0; c < cols(); ++c)
+		{
+			appended[r][c] = (*this)[r][c];
+		}
+	}
+	for (int r = 0; r < m.rows(); ++r)
+	{
+		for (int c = 0; c < m.cols(); ++c)
+		{
+			appended[r + rows()][c] = m[r][c];
+		}
+	}
+	if (cols() > m.cols())
+	{
+		for (int r = rows(); r < appended.rows(); ++r)
+		{
+			for (int c = m.cols(); c < appended.cols(); ++c)
+			{
+				appended[r][c] = 0;
+			}
+		}
+	}
+	else
+	{
+		for (int r = 0; r < rows(); ++r)
+		{
+			for (int c = cols(); c < appended.cols(); ++c)
+			{
+				appended[r][c] = 0;
+			}
+		}
+	}
+
+	return appended;
+}
+
+template<typename T>
 inline matrix<T> matrix<T>::copy() const
 {
 	matrix<T> copy = matrix<T>(rows(), cols());
-	int row = 0;
-	int col = 0;
-	for (auto i = begin(); i != end(); ++i)
+	auto src = begin();
+	auto dst = copy.begin();
+	for (; src != end() && dst != copy.end(); ++src, ++dst)
 	{
-		copy[row][col] = *i;
-		++col;
-		if (col == cols())
-		{
-			col = 0;
-			++row;
-		}
+		*dst = *src;
 	}
 
 	return copy;

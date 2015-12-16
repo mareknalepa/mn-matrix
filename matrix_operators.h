@@ -44,6 +44,22 @@ inline bool matrix<T>::operator!=(const matrix<T>& m) const
 }
 
 template<typename T>
+inline matrix<T> matrix<T>::operator+(const matrix<T>& m) const
+{
+	matrix<T> result = copy();
+	result += m;
+	return result;
+}
+
+template<typename T>
+inline matrix<T> matrix<T>::operator+(const T& value) const
+{
+	matrix<T> result = copy();
+	result += value;
+	return result;
+}
+
+template<typename T>
 inline matrix<T>& matrix<T>::operator+=(const matrix<T>& m)
 {
 	if (rows() != m.rows() || cols() != m.cols())
@@ -61,6 +77,22 @@ inline matrix<T>& matrix<T>::operator+=(const T& value)
 	for (auto i = begin(); i != end(); ++i)
 		*i += value;
 	return *this;
+}
+
+template<typename T>
+inline matrix<T> matrix<T>::operator-(const matrix<T>& m) const
+{
+	matrix<T> result = copy();
+	result -= m;
+	return result;
+}
+
+template<typename T>
+inline matrix<T> matrix<T>::operator-(const T& value) const
+{
+	matrix<T> result = copy();
+	result -= value;
+	return result;
 }
 
 template<typename T>
@@ -84,25 +116,7 @@ inline matrix<T>& matrix<T>::operator-=(const T& value)
 }
 
 template<typename T>
-inline matrix<T>& matrix<T>::operator*=(const T& value)
-{
-	for (auto i = begin(); i != end(); ++i)
-		*i *= value;
-	return *this;
-}
-
-template<typename T>
-inline matrix<T>& matrix<T>::operator/=(const T& value)
-{
-	if (value == 0)
-		throw matrix_exception("divide by zero");
-	for (auto i = begin(); i != end(); ++i)
-		*i /= value;
-	return *this;
-}
-
-template<typename T>
-inline matrix<T> matrix<T>::operator*(const matrix<T>& m)
+inline matrix<T> matrix<T>::operator*(const matrix<T>& m) const
 {
 	if (cols() != m.rows())
 		throw matrix_exception("dimensions mismatch");
@@ -119,6 +133,40 @@ inline matrix<T> matrix<T>::operator*(const matrix<T>& m)
 	}
 
 	return product;
+}
+
+template<typename T>
+inline matrix<T> matrix<T>::operator*(const T& value) const
+{
+	matrix<T> result = copy();
+	result *= value;
+	return result;
+}
+
+template<typename T>
+inline matrix<T>& matrix<T>::operator*=(const T& value)
+{
+	for (auto i = begin(); i != end(); ++i)
+		*i *= value;
+	return *this;
+}
+
+template<typename T>
+inline matrix<T> matrix<T>::operator/(const T& value) const
+{
+	matrix<T> result = copy();
+	result /= value;
+	return result;
+}
+
+template<typename T>
+inline matrix<T>& matrix<T>::operator/=(const T& value)
+{
+	if (value == 0)
+		throw matrix_exception("divide by zero");
+	for (auto i = begin(); i != end(); ++i)
+		*i /= value;
+	return *this;
 }
 
 template<typename T>
