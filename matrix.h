@@ -45,6 +45,7 @@ protected:
 public:
 	matrix();
 	matrix(int rows, int cols);
+	matrix(int rows_cols);
 
 	static matrix<T> zeros(int rows, int cols);
 	static matrix<T> zeros(int rows_cols);
@@ -125,6 +126,8 @@ public:
 		rows(1), cols(1), r_begin(0), r_end(0), c_begin(0), c_end(0), continuous(true) {}
 	properties(int rows, int cols) :
 		rows(rows), cols(cols), r_begin(0), r_end(rows - 1), c_begin(0), c_end(cols - 1), continuous(true) {}
+	properties(int rows_cols) :
+		rows(rows_cols), cols(rows_cols), r_begin(0), r_end(rows - 1), c_begin(0), c_end(cols - 1), continuous(true) {}
 	bool operator==(const properties& p) const { return rows == p.rows && cols == p.cols && r_begin == p.r_begin && r_end == p.r_end && c_begin == p.c_begin && c_end == p.c_end && continuous == p.continuous; }
 	bool operator!=(const properties& p) const { return !operator==(p); }
 	int rows;
@@ -321,6 +324,12 @@ inline matrix<T>::matrix() :
 template<typename T>
 inline matrix<T>::matrix(int rows, int cols) :
 	mem_block(new T[rows * cols], [](T* ptr) { delete[] ptr; }), p(rows, cols)
+{
+}
+
+template<typename T>
+inline matrix<T>::matrix(int rows_cols) :
+	mem_block(new T[rows_cols * rows_cols], [](T* ptr) {delete[] ptr; }), p(rows_cols)
 {
 }
 
