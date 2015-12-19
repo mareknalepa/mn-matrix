@@ -28,6 +28,16 @@ namespace mn {
 static long long seed = std::chrono::system_clock::now().time_since_epoch().count();
 static std::default_random_engine generator(static_cast<unsigned int>(seed));
 
+/**
+ * \brief Generates zero matrix
+ *
+ * Creates new matrix object, allocates memory block, initializes
+ * all elements to zero and returns it.
+ *
+ * \param rows Number of matrix rows
+ * \param cols Number of matrix columns
+ * \return Zero matrix
+*/
 template<typename T>
 inline typename matrix<T> matrix<T>::zeros(int rows, int cols)
 {
@@ -37,12 +47,31 @@ inline typename matrix<T> matrix<T>::zeros(int rows, int cols)
 	return m;
 }
 
+/**
+ * \brief Generates square zero matrix
+ *
+ * Creates new matrix object, allocates memory block, initializes
+ * all elements to zero and returns it.
+ *
+ * \param rows_cols Number of matrix rows and columns
+ * \return Zero matrix
+*/
 template<typename T>
 inline typename matrix<T> matrix<T>::zeros(int rows_cols)
 {
 	return zeros(rows_cols, rows_cols);
 }
 
+/**
+ * \brief Generates matrix with ones
+ *
+ * Creates new matrix object, allocates memory block, initializes
+ * all elements to one and returns it.
+ *
+ * \param rows Number of matrix rows
+ * \param cols Number of matrix columns
+ * \return Matrix with ones
+*/
 template<typename T>
 inline typename matrix<T> matrix<T>::ones(int rows, int cols)
 {
@@ -52,12 +81,30 @@ inline typename matrix<T> matrix<T>::ones(int rows, int cols)
 	return m;
 }
 
+/**
+ * \brief Generates square matrix with ones
+ *
+ * Creates new matrix object, allocates memory block, initializes
+ * all elements to one and returns it.
+ *
+ * \param rows_cols Number of matrix rows and columns
+ * \return Matrix with ones
+*/
 template<typename T>
 inline typename matrix<T> matrix<T>::ones(int rows_cols)
 {
 	return ones(rows_cols, rows_cols);
 }
 
+/**
+ * \brief Generates identity matrix
+ *
+ * Creates new matrix object, allocates memory block, initializes
+ * all elements on main diagonal to one, the rest to zero and returns it.
+ *
+ * \param rows_cols Number of matrix rows and columns
+ * \return Identity matrix
+*/
 template<typename T>
 inline typename matrix<T> matrix<T>::identity(int rows_cols)
 {
@@ -67,6 +114,19 @@ inline typename matrix<T> matrix<T>::identity(int rows_cols)
 	return m;
 }
 
+/**
+ * \brief Generates matrix with random values
+ *
+ * Creates new matrix object, allocates memory block, initializes
+ * all elements according to random distribution passed as argument
+ * and returns created matrix.
+ *
+ * \param rows Number of matrix rows
+ * \param cols Number of matrix columns
+ * \param random_distribution Random distribution from standard C++ library
+ * (e.g. std::normal_distribution)
+ * \return Random matrix
+*/
 template<typename T>
 template<typename R>
 inline typename matrix<T> matrix<T>::rand(int rows, int cols, R& random_distribution)
@@ -77,6 +137,18 @@ inline typename matrix<T> matrix<T>::rand(int rows, int cols, R& random_distribu
 	return m;
 }
 
+/**
+ * \brief Generates square matrix with random values
+ *
+ * Creates new matrix object, allocates memory block, initializes
+ * all elements according to random distribution passed as argument
+ * and returns created matrix.
+ *
+ * \param rows_cols Number of matrix rows and columns
+ * \param random_distribution Random distribution from standard C++ library
+ * (e.g. std::normal_distribution)
+ * \return Random matrix
+*/
 template<typename T>
 template<typename R>
 inline typename matrix<T> matrix<T>::rand(int rows_cols, R& random_distribution)

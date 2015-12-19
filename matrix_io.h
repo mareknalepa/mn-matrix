@@ -22,6 +22,17 @@
 
 namespace mn {
 
+/**
+ * \brief Input stream operator for matrix
+ *
+ * This operator reads matrix from input stream (e.g. std::cin),
+ * row-by-row. Assumes, that input stream provides correct values
+ * of proper type.
+ *
+ * \param i Input stream
+ * \param m Reference to matrix to read values to
+ * \return Input stream
+*/
 template<typename T>
 inline std::istream& operator>>(std::istream& i, matrix<T>& m)
 {
@@ -33,6 +44,17 @@ inline std::istream& operator>>(std::istream& i, matrix<T>& m)
 	return i;
 }
 
+/**
+ * \brief Output stream operator for matrix
+ *
+ * This operator prints matrix contents to output stream, such as
+ * std::cout or file stream. It divides values to rows and adds
+ * square brackets at the beginning and ending of output.
+ *
+ * \param o Output stream
+ * \param m Reference to matrix to print
+ * \return Output stream
+*/
 template<typename T>
 inline std::ostream& operator<<(std::ostream& o, const matrix<T>& m)
 {
@@ -52,7 +74,7 @@ inline std::ostream& operator<<(std::ostream& o, const matrix<T>& m)
 		o << std::endl;
 	}
 	o << "]" << std::endl;
-	
+
 	return o;
 }
 

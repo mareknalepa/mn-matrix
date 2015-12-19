@@ -24,6 +24,14 @@
 
 namespace mn {
 
+/**
+ * \brief Compares two matrices
+ *
+ * Returns true if two matrices are equal (are of the same size and contain the same elements).
+ *
+ * \param m Second matrix to compare
+ * \return True if equal
+*/
 template<typename T>
 inline bool matrix<T>::operator==(const matrix<T>& m) const
 {
@@ -37,12 +45,28 @@ inline bool matrix<T>::operator==(const matrix<T>& m) const
 	return true;
 }
 
+/**
+ * \brief Compares two matrices if they are not equal
+ *
+ * Returns true if two matrices are not equal (are of different size or contain different elements).
+ *
+ * \param m Second matrix to compare
+ * \return True if not equal
+*/
 template<typename T>
 inline bool matrix<T>::operator!=(const matrix<T>& m) const
 {
 	return !operator==(m);
 }
 
+/**
+ * \brief Adds two matrices
+ *
+ * Allocates new matrix containing sum of two matrices.
+ *
+ * \param m Matrix to add to current
+ * \return New matrix containing sum
+*/
 template<typename T>
 inline matrix<T> matrix<T>::operator+(const matrix<T>& m) const
 {
@@ -51,6 +75,14 @@ inline matrix<T> matrix<T>::operator+(const matrix<T>& m) const
 	return result;
 }
 
+/**
+ * \brief Adds matrix and value
+ *
+ * Allocates new matrix containing sum of matrix and value.
+ *
+ * \param value Value to add to current matrix
+ * \return New matrix containing sum
+*/
 template<typename T>
 inline matrix<T> matrix<T>::operator+(const T& value) const
 {
@@ -59,6 +91,15 @@ inline matrix<T> matrix<T>::operator+(const T& value) const
 	return result;
 }
 
+/**
+ * \brief Adds another matrix to current
+ *
+ * Adds matrix to current without allocating memory.
+ *
+ * \param m Matrix to add to current
+ * \return Reference to modified matrix
+ * \throws mn::matrix_exception
+*/
 template<typename T>
 inline matrix<T>& matrix<T>::operator+=(const matrix<T>& m)
 {
@@ -71,6 +112,14 @@ inline matrix<T>& matrix<T>::operator+=(const matrix<T>& m)
 	return *this;
 }
 
+/**
+ * \brief Adds value to current matrix
+ *
+ * Adds value to every element of current matrix without allocating memory.
+ *
+ * \param value Value to add to current matrix
+ * \return Reference to modified matrix
+*/
 template<typename T>
 inline matrix<T>& matrix<T>::operator+=(const T& value)
 {
@@ -79,6 +128,14 @@ inline matrix<T>& matrix<T>::operator+=(const T& value)
 	return *this;
 }
 
+/**
+ * \brief Subtracts two matrices
+ *
+ * Allocates new matrix containing difference of two matrices.
+ *
+ * \param m Matrix to subtract from current
+ * \return New matrix containing difference
+*/
 template<typename T>
 inline matrix<T> matrix<T>::operator-(const matrix<T>& m) const
 {
@@ -87,6 +144,14 @@ inline matrix<T> matrix<T>::operator-(const matrix<T>& m) const
 	return result;
 }
 
+/**
+ * \brief Subtracts value from matrix
+ *
+ * Allocates new matrix containing difference of current matrix and value.
+ *
+ * \param value Value to subtract from current matrix
+ * \return New matrix containing difference
+*/
 template<typename T>
 inline matrix<T> matrix<T>::operator-(const T& value) const
 {
@@ -95,6 +160,15 @@ inline matrix<T> matrix<T>::operator-(const T& value) const
 	return result;
 }
 
+/**
+ * \brief Subtracts another matrix from current
+ *
+ * Subtracts matrix from current without allocating memory.
+ *
+ * \param m Matrix to subtract from current
+ * \return Reference to modified matrix
+ * \throws mn::matrix_exception
+*/
 template<typename T>
 inline matrix<T>& matrix<T>::operator-=(const matrix<T>& m)
 {
@@ -107,6 +181,14 @@ inline matrix<T>& matrix<T>::operator-=(const matrix<T>& m)
 	return *this;
 }
 
+/**
+ * \brief Subtracts value from current matrix
+ *
+ * Subtracts value from every element of current matrix without allocating memory.
+ *
+ * \param value Value to subtract from current matrix
+ * \return Reference to modified matrix
+*/
 template<typename T>
 inline matrix<T>& matrix<T>::operator-=(const T& value)
 {
@@ -115,6 +197,15 @@ inline matrix<T>& matrix<T>::operator-=(const T& value)
 	return *this;
 }
 
+/**
+ * \brief Multiplies two matrices
+ *
+ * Allocates new matrix containing product of two matrices.
+ *
+ * \param m Matrix to right-hand-side multiply with current
+ * \return New matrix containing product
+ * \throws mn::matrix_exception
+*/
 template<typename T>
 inline matrix<T> matrix<T>::operator*(const matrix<T>& m) const
 {
@@ -135,6 +226,14 @@ inline matrix<T> matrix<T>::operator*(const matrix<T>& m) const
 	return product;
 }
 
+/**
+ * \brief Multiplies matrix by value
+ *
+ * Allocates new matrix containing product of matrix and value.
+ *
+ * \param value Value to multiply current matrix by
+ * \return New matrix containing product
+*/
 template<typename T>
 inline matrix<T> matrix<T>::operator*(const T& value) const
 {
@@ -143,6 +242,14 @@ inline matrix<T> matrix<T>::operator*(const T& value) const
 	return result;
 }
 
+/**
+ * \brief Multiplies current matrix by value
+ *
+ * Multiplies every element of current matrix by value without allocating memory.
+ *
+ * \param value Value to multiply current matrix by
+ * \return Reference to modified matrix
+*/
 template<typename T>
 inline matrix<T>& matrix<T>::operator*=(const T& value)
 {
@@ -151,6 +258,14 @@ inline matrix<T>& matrix<T>::operator*=(const T& value)
 	return *this;
 }
 
+/**
+ * \brief Divides matrix by value
+ *
+ * Allocates new matrix containing matrix divided by value.
+ *
+ * \param value Value to divide current matrix by
+ * \return New matrix containing product
+*/
 template<typename T>
 inline matrix<T> matrix<T>::operator/(const T& value) const
 {
@@ -159,6 +274,15 @@ inline matrix<T> matrix<T>::operator/(const T& value) const
 	return result;
 }
 
+/**
+ * \brief Divides current matrix by value
+ *
+ * Divides every element of current matrix by value without allocating memory.
+ *
+ * \param value Value to divide current matrix by
+ * \return Reference to modified matrix
+ * \throws mn::matrix_exception
+*/
 template<typename T>
 inline matrix<T>& matrix<T>::operator/=(const T& value)
 {
@@ -169,6 +293,14 @@ inline matrix<T>& matrix<T>::operator/=(const T& value)
 	return *this;
 }
 
+/**
+ * \brief Calculates matrix determinant
+ *
+ * Calculates matrix determinant using Laplace expansion (recursive method).
+ *
+ * \return Matrix determinant
+ * \throws mn::matrix_exception
+*/
 template<typename T>
 inline T matrix<T>::det() const
 {
