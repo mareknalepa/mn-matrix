@@ -54,8 +54,8 @@ Accessing elements with specified coordinates using subscript operators:
 Accessing using row -> element iterators:
 
     for (auto row = m.first_row(); row != m.last_row(); ++row)
-		for (auto element = row.first_element(); element != row.last_element(); ++element)
-			std::cout << *element << std::endl;
+        for (auto element = row.first_element(); element != row.last_element(); ++element)
+            std::cout << *element << std::endl;
 
 Accessing using col -> element iterators:
 
@@ -88,6 +88,10 @@ is not copied.
 
     mn::matrix<double> mclone(m);
     mn::matrix<double> mcopy = m;
+
+To explicitly copy matrix (including memory block):
+
+    auto copied_m = m.copy();
 
 To create submatrix, user have to specify interesting region of original matrix:
 
